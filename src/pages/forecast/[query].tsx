@@ -24,19 +24,30 @@ const WeatherIcon = ({ code }: { code: string }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<ForecastProps> = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps<ForecastProps> = async (context) => {
   try {
-    if (!params?.query) {
+    const { params, query } = context;
+    let apiUrl: string;
+
+    //Verify zip code
+    if (query.zip) {
+      const zip = query.zip;
+      const country = query.country || 'US';
+      apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/weather?zip=${zip}&country=${country}`;
+    }
+    // Verifica se é busca por cidade
+    else if (params?.query) {
+      const searchQuery = Array.isArray(params.query) ? params.query[0] : params.query;
+      const encodedQuery = encodeURIComponent(searchQuery);
+      apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/weather?query=${encodedQuery}`;
+    } else {
       return {
         props: { error: 'No search query provided. Please specify a location.' },
       };
     }
 
-    const searchQuery = Array.isArray(params.query) ? params.query[0] : params.query;
-    const encodedQuery = encodeURIComponent(searchQuery);
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/weather?query=${encodedQuery}`;
-
     const res = await fetch(apiUrl);
+
     if (!res.ok) {
       throw new Error(`API returned status ${res.status}`);
     }

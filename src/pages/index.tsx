@@ -7,11 +7,31 @@ import { MapPin, Wind, Droplets, Search, Cloud } from 'lucide-react';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState<'city' | 'zip'>('city');
+  const [zipCode, setZipCode] = useState('');
+  const [country, setCountry] = useState('CA');
   const [localWeather, setLocalWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { coordinates} = useGeolocation();
+  const { coordinates, error: geoError, loading: geoLoading } = useGeolocation();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (searchType === 'zip' && zipCode.trim()) {
+      router.push({
+        pathname: '/forecast',
+        query: { 
+          zip: zipCode.trim(),
+          country: country 
+        }
+      });
+    } else if (searchType === 'city' && searchQuery.trim()) {
+      
+      router.push(`/forecast/${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   useEffect(() => {
     async function fetchLocalWeather() {
@@ -106,27 +126,69 @@ export default function Home() {
             <h2 className="text-xl font-semibold">Search Location</h2>
           </div>
 
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if (searchQuery.trim()) {
-              router.push(`/forecast/${encodeURIComponent(searchQuery)}`);
-            }
-          }}>
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent transition-all"
-                placeholder="e.g., London or 10001"
-                required
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Seletor de tipo de busca */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSearchType('city')}
+                className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                  searchType === 'city'
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50'
+                }`}
+              >
+                City Name
+              </button>
+              <button
+                type="button"
+                onClick={() => setSearchType('zip')}
+                className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                  searchType === 'zip'
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50'
+                }`}
+              >
+                Postal Code
+              </button>
             </div>
+
+            {searchType === 'city' ? (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent transition-all"
+                  placeholder="e.g., Toronto"
+                  required
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value)}
+                  className="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent transition-all"
+                  placeholder="Enter postal code"
+                  required
+                />
+                <select
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent transition-all"
+                >
+                  <option value="CA">Canada</option>
+                  <option value="US">United States</option>
+                </select>
+              </div>
+            )}
 
             <button
               type="submit"
-              className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all duration-200 transform hover:-translate-y-0.5"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all duration-200 transform hover:-translate-y-0.5"
             >
               Get Weather
             </button>
