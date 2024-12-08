@@ -6,3 +6,8 @@ export interface WeatherData {
     windSpeed: number;
     icon: string;
   }
+  
+  export interface Coordinates {
+    lat: number;
+    lon: number;
+  }
