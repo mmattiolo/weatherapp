@@ -11,7 +11,6 @@ A modern, responsive weather application built with Next.js that provides real-t
 - **Location-based Weather**: Automatically detect and display weather for user's current location
 - **Flexible Search Options**: 
   - Search by city name
-  - Search by postal code (supports US ZIP codes and Canadian postal codes)
 - **Responsive Design**: Fully responsive interface with glass-morphic UI elements
 - **Dynamic Weather Icons**: Visual representation of weather conditions
 - **Error Handling**: Comprehensive error messages for better user experience
@@ -19,7 +18,6 @@ A modern, responsive weather application built with Next.js that provides real-t
 ## Technologies Used
 
 - **Frontend Framework**: Next.js 15.0
-- **UI Framework**: React 19.0
 - **Styling**: Tailwind CSS 3.4
 - **Icons**: Lucide React
 - **API**: OpenWeather API
