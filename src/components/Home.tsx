@@ -1,8 +1,43 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useGeolocation } from '../hooks/useGeolocation';  // Ajuste o caminho
-import { WeatherData } from '../app/types/weather';        // Ajuste o caminho
-import { MapPin, Wind, Droplets, Search, Cloud } from 'lucide-react';
+import { useGeolocation } from '../hooks/useGeolocation';  
+import { WeatherData, ForecastDay as ForecastDayType } from '../app/types/weather';       
+import { MapPin, Wind, Droplets, Search, Cloud, Calendar } from 'lucide-react';
+
+const WeatherIcon = ({ code }: { code: string }) => (
+  <div className="relative w-16 h-16">
+    <img
+      src={`/weather-icons/${code}.svg`}
+      alt="Weather condition"
+      className="w-full h-full"
+    />
+  </div>
+);
+
+const ForecastDay = ({ day }: { day: ForecastDayType }) => (
+  <div className="bg-white/5 backdrop-blur p-3 rounded-xl border border-white/10 transition-all hover:bg-white/10">
+    <p className="text-gray-300 text-sm mb-2">
+      {new Date(day.dt * 1000).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      })}
+    </p>
+    <div className="flex flex-col items-center">
+      <WeatherIcon code={day.icon} />
+      <p className="text-xl font-bold mt-2">{day.temp}°</p>
+      <p className="text-xs text-gray-300 capitalize mt-1">{day.description}</p>
+      <div className="flex items-center gap-2 mt-2">
+        <Wind className="w-3 h-3 text-gray-400" />
+        <span className="text-xs text-gray-300">{day.windSpeed} m/s</span>
+      </div>
+      <div className="flex items-center gap-2 mt-1">
+        <Droplets className="w-3 h-3 text-gray-400" />
+        <span className="text-xs text-gray-300">{day.humidity}%</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +75,6 @@ export default function Home() {
         fetchLocalWeather();
     }, [coordinates]);
 
-    // Em components/Home.tsx
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -60,14 +94,14 @@ export default function Home() {
 
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center p-6">
-            {/* Efeito de glassmorphism no background */}
+            {/* Background effect */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
             </div>
 
-            {/* Card Principal */}
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl border border-gray-200/20 shadow-2xl w-full max-w-md p-8 text-white">
+            {/* Main Card */}
+            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl border border-gray-200/20 shadow-2xl w-full max-w-2xl p-8 text-white">
                 <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900/50 p-4 rounded-full backdrop-blur-sm border border-gray-700">
                     <Cloud className="w-8 h-8 text-white/80" />
                 </div>
@@ -78,7 +112,7 @@ export default function Home() {
 
                 {/* Local Weather Section */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-2 text-gray-300">
+                    <div className="flex items-center gap-2 text-gray-300 mb-4">
                         <MapPin className="w-5 h-5" />
                         <h2 className="text-xl font-semibold">Your Location</h2>
                     </div>
@@ -108,24 +142,42 @@ export default function Home() {
                     )}
 
                     {localWeather && !loading && !error && (
-                        <div className="mt-4 bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10 transition-all hover:bg-white/10">
-                            <h3 className="text-xl font-medium mb-4">{localWeather.location}</h3>
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <p className="text-4xl font-bold mb-2">{localWeather.temperature}°C</p>
-                                    <p className="text-gray-300 capitalize">{localWeather.description}</p>
-                                </div>
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-gray-300">
-                                        <Wind className="w-4 h-4" />
-                                        <span>{localWeather.windSpeed} m/s</span>
+                        <div className="space-y-6">
+                            <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10 transition-all hover:bg-white/10">
+                                <h3 className="text-xl font-medium mb-4">{localWeather.location}</h3>
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className="text-4xl font-bold mb-2">{localWeather.temperature}°C</p>
+                                        <p className="text-gray-300 capitalize">{localWeather.description}</p>
                                     </div>
-                                    <div className="flex items-center gap-2 text-gray-300">
-                                        <Droplets className="w-4 h-4" />
-                                        <span>{localWeather.humidity}%</span>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-gray-300">
+                                            <Wind className="w-4 h-4" />
+                                            <span>{localWeather.windSpeed} m/s</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-gray-300">
+                                            <Droplets className="w-4 h-4" />
+                                            <span>{localWeather.humidity}%</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* 5-Day Forecast */}
+                            {localWeather.forecast && localWeather.forecast.length > 0 && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <Calendar className="w-5 h-5 text-gray-300" />
+                                        <h2 className="text-xl font-semibold text-gray-300">5-Day Forecast</h2>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                        {localWeather.forecast.map((day) => (
+                                            <ForecastDay key={day.dt} day={day} />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -138,15 +190,15 @@ export default function Home() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Tipo de Busca */}
                         <div className="grid grid-cols-2 gap-2">
                             <button
                                 type="button"
                                 onClick={() => setSearchType('city')}
-                                className={`px-4 py-2 rounded-xl font-medium transition-all ${searchType === 'city'
-                                    ? 'bg-gray-700 text-white'
-                                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50'
-                                    }`}
+                                className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                                    searchType === 'city'
+                                        ? 'bg-gray-700 text-white'
+                                        : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50'
+                                }`}
                             >
                                 City Name
                             </button>
