@@ -8,35 +8,35 @@ interface ForecastProps {
   error?: string;
 }
 
-const WeatherIcon = ({ code }: { code: string }) => {
-  const getIconPath = (code: string) => {
-    return `/weather-icons/${code}.svg`;
-  };
-
-  return (
-    <div className="relative w-32 h-32">
-      <img
-        src={getIconPath(code)}
-        alt="Weather condition"
-        className="w-full h-full"
-      />
-    </div>
-  );
-};
+const WeatherIcon = ({ code }: { code: string }) => (
+  <div className="relative w-32 h-32">
+    <img
+      src={`/weather-icons/${code}.svg`}
+      alt="Weather condition"
+      className="w-full h-full"
+    />
+  </div>
+);
 
 export const getServerSideProps: GetServerSideProps<ForecastProps> = async (context) => {
   try {
-    const { params, query } = context;
+    const { query, params } = context;
     let apiUrl: string;
 
-    //Verify zip code
     if (query.zip) {
-      const zip = query.zip;
-      const country = query.country || 'US';
-      apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/weather?zip=${zip}&country=${country}`;
-    }
-    // Verifica se é busca por cidade
-    else if (params?.query) {
+      // Busca por CEP
+      const [postalCode, countryCode] = String(query.zip).split(',');
+      if (!postalCode || !countryCode) {
+        return {
+          props: { error: 'Invalid postal code format. Please use "code,country" format.' },
+        };
+      }
+
+
+      const formattedZip = postalCode.replace(/[\s-]/g, '');
+      apiUrl = `http://api.openweathermap.org/geo/1.0/zip?zip=${formattedZip},${countryCode.toUpperCase()}&appid=${process.env.OPENWEATHER_API_KEY}`;
+    } else if (params?.query) {
+      // Busca por cidade
       const searchQuery = Array.isArray(params.query) ? params.query[0] : params.query;
       const encodedQuery = encodeURIComponent(searchQuery);
       apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/weather?query=${encodedQuery}`;
@@ -47,27 +47,21 @@ export const getServerSideProps: GetServerSideProps<ForecastProps> = async (cont
     }
 
     const res = await fetch(apiUrl);
-
     if (!res.ok) {
       throw new Error(`API returned status ${res.status}`);
     }
-    
-    const data = await res.json();
 
+    const data = await res.json();
     if ('error' in data) {
       return {
         props: { error: data.error },
       };
     }
 
-    return {
-      props: { weatherData: data },
-    };
+    return { props: { weatherData: data } };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to load weather data';
-    return {
-      props: { error: errorMessage },
-    };
+    return { props: { error: errorMessage } };
   }
 };
 
