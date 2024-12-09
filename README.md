@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weather Dashboard
 
-## Getting Started
+A modern, responsive weather application built with Next.js that provides real-time weather information and 5-day forecasts. The application features a sleek, glass-morphic UI design and supports both city name and postal code searches.
 
-First, run the development server:
+![Weather Dashboard Preview](/api/placeholder/800/400)
 
+## Features
+
+- **Real-time Weather Data**: Get current weather conditions including temperature, wind speed, and humidity
+- **5-Day Forecast**: View weather predictions for the next five days
+- **Location-based Weather**: Automatically detect and display weather for user's current location
+- **Flexible Search Options**: 
+  - Search by city name
+  - Search by postal code (supports US ZIP codes and Canadian postal codes)
+- **Responsive Design**: Fully responsive interface with glass-morphic UI elements
+- **Dynamic Weather Icons**: Visual representation of weather conditions
+- **Error Handling**: Comprehensive error messages for better user experience
+
+## Technologies Used
+
+- **Frontend Framework**: Next.js 15.0
+- **UI Framework**: React 19.0
+- **Styling**: Tailwind CSS 3.4
+- **Icons**: Lucide React
+- **API**: OpenWeather API
+- **Type Safety**: TypeScript
+
+## Prerequisites
+
+Before you begin, ensure you have:
+- Node.js (Latest LTS version recommended)
+- OpenWeather API key
+
+## Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd weatherapp
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Create a `.env.local` file in the root directory and add your OpenWeather API key:
+```env
+OPENWEATHER_API_KEY=your_api_key_here
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Start the development server:
+```bash
+npm run dev
+```
 
-## Learn More
+The application will be available at `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+weatherapp/
+├── src/
+│   ├── app/
+│   │   └── types/
+│   │       └── weather.ts
+│   ├── pages/
+│   │   ├── api/
+│   │   │   └── weather.ts
+│   │   ├── forecast/
+│   │   │   └── [query].tsx
+│   │   └── index.tsx
+│   └── hooks/
+│       └── useGeolocation.ts
+├── public/
+│   └── weather-icons/
+└── package.json
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API Routes
 
-## Deploy on Vercel
+### GET /api/weather
+Accepts the following query parameters:
+- `lat` & `lon`: Coordinates for location-based weather
+- `query`: City name for city-based weather search
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Returns weather data including:
+- Current temperature
+- Weather description
+- Wind speed
+- Humidity
+- 5-day forecast
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development
+
+To run the development server with Turbopack:
+```bash
+npm run dev
+```
+
+For production build:
+```bash
+npm run build
+npm start
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Weather data provided by [OpenWeather API](https://openweathermap.org/api)
+- Icons by [Lucide](https://lucide.dev/)
