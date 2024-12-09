@@ -51,7 +51,8 @@ OPENWEATHER_API_KEY=your_api_key_here
 
 4. Start the development server:
 ```bash
-npm run dev
+npx next build
+npx next start
 ```
 
 The application will be available at `http://localhost:3000`
@@ -64,6 +65,7 @@ weatherapp/
 │   ├── app/
 │   │   └── types/
 │   │       └── weather.ts
+│   ├── components/Home.tsx
 │   ├── pages/
 │   │   ├── api/
 │   │   │   └── weather.ts
@@ -72,8 +74,6 @@ weatherapp/
 │   │   └── index.tsx
 │   └── hooks/
 │       └── useGeolocation.ts
-├── public/
-│   └── weather-icons/
 └── package.json
 ```
 
@@ -95,13 +95,8 @@ Returns weather data including:
 
 To run the development server with Turbopack:
 ```bash
-npm run dev
-```
-
-For production build:
-```bash
-npm run build
-npm start
+npx next build
+npx next start
 ```
 
 ## Contributing
